@@ -1,6 +1,6 @@
 ﻿using FlashCards.Menus;
 using Spectre.Console;
-
+    
 namespace FlashCards;
 
 class Program
@@ -21,7 +21,7 @@ class Program
                     .PageSize(5)
                     .MoreChoicesText("[grey](Move up and down to reveal more options)[/]")
                     .AddChoices([
-                        "Manage Flash Cards" ,"Manage Decks", "Study Flash Cards", "View Study Sessions", "Exit Program"
+                        "Manage Flash Cards", "Manage Decks", "Study Flash Cards", "View Study Sessions", "Exit Program"
                     ]));
 
             switch (selection)
@@ -44,7 +44,6 @@ class Program
                 case "Exit Program":
                     continueProgram = false;
                     Console.WriteLine("Exited Program");
-                    Console.ReadLine();
                     break;
             }
         }

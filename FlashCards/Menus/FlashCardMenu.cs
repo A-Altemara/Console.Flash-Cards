@@ -32,7 +32,7 @@ public class FlashCardMenu()
                     DeleteFlashCard();
                     break;
                 case "Edit FlashCard":
-                   EditFlashCard();
+                    EditFlashCard();
                     break;
                 case "View FlashCards":
                     AnsiConsole.WriteLine("View FlashCards, press enter to continue");
