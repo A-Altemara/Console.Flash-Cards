@@ -19,11 +19,18 @@ This application allows users to create and study Stacks of Flashcards. Each sta
 
 ## Dependancies
 SQL Server
+Docker
 
 ### Installation and Setup
 - Clone the repository.
-- Run the necessary migrations to create the database tables for stacks, flashcards, and study sessions.
-- Start the application.
+- build the docker image using the following command:
+```bash docker build -t flashcards-app . ```
+- run docker container using the following command:
+```bash docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=P@ssword1" -p 1433:1433 --name flashcards-db -d mcr.microsoft.com/mssql/server:2019-latest ```
+- Start the application using the following command:
+```bash dotnet run ```
+- access the application on the browser using the following URL:
+```bash http://localhost:5000 ```
 
 ## MIT License
 - Copyright (c) 2024 Airiel Altemara
