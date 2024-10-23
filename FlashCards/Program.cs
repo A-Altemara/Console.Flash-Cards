@@ -30,8 +30,7 @@ class Program
                     FlashCardMenu.DisplayFlashCardMenu();
                     break;
                 case "Manage Decks":
-                    AnsiConsole.WriteLine("Manage Decks Menu, press enter to continue");
-                    Console.ReadLine();
+                    DeckMenu.DisplayDecksMenu();
                     break;
                 case "Study Flash Cards":
                     AnsiConsole.WriteLine("Study Flash Cards, press enter to continue");

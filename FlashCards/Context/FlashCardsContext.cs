@@ -18,24 +18,24 @@ public class FlashCardsContext : DbContext
         var path = Environment.GetFolderPath(folder);
         DbPath = Path.Join(path, "FlashCardsApp@localhost");
     }
-public FlashCardsContext(DbContextOptions<FlashCardsContext> options)
-    : base(options)
-{
-}
-
-protected override void OnConfiguring(DbContextOptionsBuilder options)
-{
-    if (!options.IsConfigured)
+    public FlashCardsContext(DbContextOptions<FlashCardsContext> options)
+        : base(options)
     {
-        var configuration = new ConfigurationBuilder()
-            .SetBasePath(AppContext.BaseDirectory)
-            .AddJsonFile("appsettings.json")
-            .Build();
-        options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
     }
-}
 
-protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnConfiguring(DbContextOptionsBuilder options)
+    {
+        if (!options.IsConfigured)
+        {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json")
+                .Build();
+            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+        }
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<FlashCard>()
             .HasOne<Deck>(f => f.Deck)

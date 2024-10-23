@@ -19,6 +19,7 @@ This application allows users to create and study Stacks of Flashcards. Each sta
 
 ## Dependancies
 SQL Server
+Entity Framework
 Docker
 
 ### Installation and Setup

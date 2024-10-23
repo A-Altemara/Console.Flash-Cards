@@ -51,6 +51,43 @@ public class FlashCardMenu()
     {
         AnsiConsole.WriteLine("Add A new FlashCard, press enter to continue");
         Console.ReadLine();
+        Console.Clear();
+        AnsiConsole.Markup("[bold Purple]Add a new flash card![/]\n");
+        AnsiConsole.Markup("[Purple]Please select from the following options[/]\n");
+        var selection = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .Title("What's your Selection?")
+                .PageSize(5)
+                .MoreChoicesText("[grey](Move up and down to reveal more options)[/]")
+                .AddChoices([
+                    "Add to an existing Deck", "Add a card to a new Deck", "Return to Flash Card Menu"
+                ]));
+
+        switch (selection)
+        {
+            case "add to an existing Deck":
+                AddToExistingDeck();
+                break;
+            case "Add a card to a new Deck":
+                AddToANewDeck();
+                break;
+            case "Return to Flash Card Menu":
+                AnsiConsole.WriteLine("Returning to Flash Card Menu, press enter to continue");
+                Console.ReadLine();
+                break;
+            
+        }
+        
+    }
+
+    private static void AddToANewDeck()
+    {
+        throw new NotImplementedException();
+    }
+
+    private static void AddToExistingDeck()
+    {
+        throw new NotImplementedException();
     }
 
     public static void DeleteFlashCard()
