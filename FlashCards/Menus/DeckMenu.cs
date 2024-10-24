@@ -49,7 +49,7 @@ public class DeckMenu()
         }
     }
 
-    private static List<Deck> ViewDecks()
+    public static List<Deck> ViewDecks()
     {
         using (var context = new FlashCardsContext())
         {
@@ -88,6 +88,13 @@ public class DeckMenu()
         AnsiConsole.WriteLine("Enter the ID of the deck you would like to edit:");
         int deckId = Convert.ToInt32(Console.ReadLine());
         var deck = deckList.FirstOrDefault(d => d.Id == deckId);
+        if (deck == null)
+        {
+            AnsiConsole.WriteLine("Deck not found. Press enter to continue.");
+            Console.ReadLine();
+            return;
+        }
+        
         AnsiConsole.WriteLine("Enter the new name for the deck:");
         string newDeckName = Console.ReadLine();
         using (var context = new FlashCardsContext())
@@ -112,6 +119,13 @@ public class DeckMenu()
         AnsiConsole.WriteLine("Enter the ID of the deck you would like to delete:");
         int deckId = Convert.ToInt32(Console.ReadLine());
         var deck = deckList.FirstOrDefault(d => d.Id == deckId);
+        if (deck == null)
+        {
+            AnsiConsole.WriteLine("Deck not found. Press enter to continue.");
+            Console.ReadLine();
+            return;
+        }
+        
         AnsiConsole.WriteLine(
             $"Are you sure you want to delete the deck '{deck.DeckName}'? This will delete all associated flash cards and study sessions. (Y/N)");
         string confirmation = Console.ReadLine();
@@ -129,12 +143,12 @@ public class DeckMenu()
 
         if (confirmation.ToLower() == "n")
         {
-            AnsiConsole.WriteLine("Deck not deleted. Press enter to continue back to menue.");
+            AnsiConsole.WriteLine("Deck not deleted. Press enter to continue back to menu.");
             Console.ReadLine();
         }
     }
 
-    private static void AddDeck()
+    public static void AddDeck()
     {
         Console.Clear();
         AnsiConsole.WriteLine("Enter the name of the new deck:");
