@@ -79,72 +79,78 @@ public class DeckMenu()
 
     private static void EditDeck()
     {
-        var deckList = ViewDecks();
-        if (deckList.Count == 0)
-        {
-            return;
-        }
-
-        AnsiConsole.WriteLine("Enter the ID of the deck you would like to edit:");
-        int deckId = Convert.ToInt32(Console.ReadLine());
-        var deck = deckList.FirstOrDefault(d => d.Id == deckId);
-        if (deck == null)
-        {
-            AnsiConsole.WriteLine("Deck not found. Press enter to continue.");
-            Console.ReadLine();
-            return;
-        }
-        
-        AnsiConsole.WriteLine("Enter the new name for the deck:");
-        string newDeckName = Console.ReadLine();
         using (var context = new FlashCardsContext())
         {
+            var decks = context.Decks.ToList();
+
+            if (decks.Count == 0)
+            {
+                return;
+            }
+
+            var deckNames = decks.Select(d => $"{d.Id}: {d.DeckName}").ToList();
+            var selectedDeck = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("Select the deck you would like to edit:")
+                    .PageSize(10)
+                    .AddChoices(deckNames)
+            );
+
+            int deckId = int.Parse(selectedDeck.Split(':')[0]);
+            var deck = decks.FirstOrDefault(d => d.Id == deckId);
+            
+            AnsiConsole.WriteLine("Enter the new name for the deck:");
+            string newDeckName = Console.ReadLine();
+
             deck.DeckName = newDeckName;
             context.Decks.Update(deck);
             context.SaveChanges();
+            
+            AnsiConsole.WriteLine($"Deck '{deck.DeckName}' updated successfully. Press enter to continue.");
+            Console.ReadLine();
         }
-
-        AnsiConsole.WriteLine($"Deck '{deck.DeckName}' updated successfully. Press enter to continue.");
-        Console.ReadLine();
     }
 
     private static void DeleteDeck()
     {
-        var deckList = ViewDecks();
-        if (deckList.Count == 0)
+        using (var context = new FlashCardsContext())
         {
-            return;
-        }
+            var decks = context.Decks.ToList();
 
-        AnsiConsole.WriteLine("Enter the ID of the deck you would like to delete:");
-        int deckId = Convert.ToInt32(Console.ReadLine());
-        var deck = deckList.FirstOrDefault(d => d.Id == deckId);
-        if (deck == null)
-        {
-            AnsiConsole.WriteLine("Deck not found. Press enter to continue.");
-            Console.ReadLine();
-            return;
-        }
-        
-        AnsiConsole.WriteLine(
-            $"Are you sure you want to delete the deck '{deck.DeckName}'? This will delete all associated flash cards and study sessions. (Y/N)");
-        string confirmation = Console.ReadLine();
-        if (confirmation.ToLower() == "y")
-        {
-            using (var context = new FlashCardsContext())
+            if (decks.Count == 0)
+            {
+                return;
+            }
+
+            var deckNames = decks.Select(d => $"{d.Id}: {d.DeckName}").ToList();
+            var selectedDeck = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("Select the deck you would like to edit:")
+                    .PageSize(10)
+                    .AddChoices(deckNames)
+            );
+            int deckId = int.Parse(selectedDeck.Split(':')[0]);
+            var deck = decks.FirstOrDefault(d => d.Id == deckId);
+
+            string confirmation =AnsiConsole.Ask<string>(
+                $"Are you sure you want to delete the deck '{deck.DeckName}'? " +
+                $"This will delete all associated flash cards and study sessions. (Y/N)");
+            
+            if (confirmation.ToLower() == "y")
             {
                 context.Decks.Remove(deck);
                 context.SaveChanges();
+
+
+                AnsiConsole.WriteLine($"Deck '{deck.DeckName}' deleted successfully. Press enter to continue.");
+                Console.ReadLine();
             }
 
-            AnsiConsole.WriteLine($"Deck '{deck.DeckName}' deleted successfully. Press enter to continue.");
-            Console.ReadLine();
-        }
-
-        if (confirmation.ToLower() == "n")
-        {
-            AnsiConsole.WriteLine("Deck not deleted. Press enter to continue back to menu.");
-            Console.ReadLine();
+            if (confirmation.ToLower() == "n")
+            {
+                AnsiConsole.WriteLine("Deck not deleted. Press enter to continue back to menu.");
+                Console.ReadLine();
+            }
         }
     }
 
