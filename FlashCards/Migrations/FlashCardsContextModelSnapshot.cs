@@ -72,20 +72,18 @@ namespace FlashCards.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Answers")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("DeckStudiedId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Correct")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("NumberAsked")
+                        .HasColumnType("int");
 
-                    b.Property<int>("DeckId")
+                    b.Property<int>("NumberCorrect")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DeckId");
+                    b.HasIndex("DeckStudiedId");
 
                     b.ToTable("StudySessions");
                 });
@@ -103,13 +101,13 @@ namespace FlashCards.Migrations
 
             modelBuilder.Entity("FlashCards.Models.StudySession", b =>
                 {
-                    b.HasOne("FlashCards.Models.Deck", "Deck")
+                    b.HasOne("FlashCards.Models.Deck", "DeckStudied")
                         .WithMany("StudySessions")
-                        .HasForeignKey("DeckId")
+                        .HasForeignKey("DeckStudiedId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Deck");
+                    b.Navigation("DeckStudied");
                 });
 
             modelBuilder.Entity("FlashCards.Models.Deck", b =>

@@ -3,8 +3,8 @@ namespace FlashCards.Models;
 public class StudySession
 {
     public int Id { get; set; }
-    public string Answers { get; set; }
-    public string Correct { get; set; }
-    public int DeckId { get; set; }
-    public Deck Deck { get; set; }
+    public int NumberAsked { get; set; }
+    public int NumberCorrect { get; set; }
+    public int DeckStudiedId { get; set; } 
+    public required Deck DeckStudied { get; set; }
 }

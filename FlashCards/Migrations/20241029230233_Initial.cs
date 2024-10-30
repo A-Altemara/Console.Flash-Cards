@@ -50,16 +50,16 @@ namespace FlashCards.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Answers = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Correct = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DeckId = table.Column<int>(type: "int", nullable: false)
+                    NumberAsked = table.Column<int>(type: "int", nullable: false),
+                    NumberCorrect = table.Column<int>(type: "int", nullable: false),
+                    DeckStudiedId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_StudySessions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_StudySessions_Decks_DeckId",
-                        column: x => x.DeckId,
+                        name: "FK_StudySessions_Decks_DeckStudiedId",
+                        column: x => x.DeckStudiedId,
                         principalTable: "Decks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -71,9 +71,9 @@ namespace FlashCards.Migrations
                 column: "DeckId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StudySessions_DeckId",
+                name: "IX_StudySessions_DeckStudiedId",
                 table: "StudySessions",
-                column: "DeckId");
+                column: "DeckStudiedId");
         }
 
         /// <inheritdoc />

@@ -42,9 +42,9 @@ public class FlashCardsContext : DbContext
             .WithMany(d => d.FlashCards)
             .HasForeignKey(f => f.DeckId);
         modelBuilder.Entity<StudySession>()
-            .HasOne<Deck>(s => s.Deck)
+            .HasOne<Deck>(s => s.DeckStudied)
             .WithMany(d => d.StudySessions)
-            .HasForeignKey(s => s.DeckId);
+            .HasForeignKey(s => s.DeckStudiedId);
         base.OnModelCreating(modelBuilder);
     }
 }

@@ -27,7 +27,7 @@ public class FlashCardMenu()
             switch (selection)
             {
                 case "Add FlashCard":
-                    AddFlashCard();
+                    AddFlashCardMenu();
                     break;
                 case "Delete FlashCard":
                     DeleteFlashCard();
@@ -36,7 +36,13 @@ public class FlashCardMenu()
                     EditFlashCard();
                     break;
                 case "View FlashCards":
-                    GetAndViewFlashCards();
+                    DeckMenu.ViewDecks();
+                    var deckId = AnsiConsole.Ask<int>("Which Deck ID would you like to view FlashCards for?");
+                    var flashCards = GetFlashCards(deckId);
+                    ViewFlashCards(flashCards);
+                    AnsiConsole.WriteLine("Press enter to continue.");
+                    Console.ReadLine();
+                    break;
                     break;
                 case "Return to Main Menu":
                     continueProgram = false;
@@ -62,7 +68,7 @@ public class FlashCardMenu()
         ViewFlashCards(flashCards);
     }
 
-    public static void AddFlashCard()
+    public static void AddFlashCardMenu()
     {
         var continueProgram = true;
 
@@ -77,7 +83,7 @@ public class FlashCardMenu()
                     .PageSize(5)
                     .MoreChoicesText("[grey](Move up and down to reveal more options)[/]")
                     .AddChoices([
-                        "Add to an existing Deck", "Add a card to a new Deck", "View FlashCards",
+                        "Add to an existing Deck", "Add a card to a new Deck",
                         "Return to Flash Card Menu"
                     ]));
 
@@ -89,14 +95,6 @@ public class FlashCardMenu()
                     break;
                 case "Add a card to a new Deck":
                     AddToANewDeck();
-                    break;
-                case "View FlashCards":
-                    DeckMenu.ViewDecks();
-                    var deckId = AnsiConsole.Ask<int>("Which Deck ID would you like to view FlashCards for?");
-                    var flashCards = GetFlashCards(deckId);
-                    ViewFlashCards(flashCards);
-                    AnsiConsole.WriteLine("Press enter to continue.");
-                    Console.ReadLine();
                     break;
                 case "Return to Flash Card Menu":
                     continueProgram = false;
@@ -185,7 +183,7 @@ public class FlashCardMenu()
         Console.ReadLine();
     }
 
-    private static Dictionary<int, FlashCard> GetFlashCards(int deckId)
+    public static Dictionary<int, FlashCard> GetFlashCards(int deckId)
     {
         using (var context = new FlashCardsContext())
         {

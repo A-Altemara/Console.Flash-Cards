@@ -21,7 +21,7 @@ class Program
                     .PageSize(5)
                     .MoreChoicesText("[grey](Move up and down to reveal more options)[/]")
                     .AddChoices([
-                        "Manage Flash Cards", "Manage Decks", "Study Flash Cards", "View Study Sessions", "Exit Program"
+                        "Manage Flash Cards", "Manage Decks", "Study Menu", "Exit Program"
                     ]));
 
             switch (selection)
@@ -32,12 +32,8 @@ class Program
                 case "Manage Decks":
                     DeckMenu.DisplayDecksMenu();
                     break;
-                case "Study Flash Cards":
-                    AnsiConsole.WriteLine("Study Flash Cards, press enter to continue");
-                    Console.ReadLine();
-                    break;
-                case "View Study Sessions":
-                    AnsiConsole.WriteLine("View Study Sessions, press enter to continue");
+                case "Study Menu":
+                    StudySessionMenu.DisplayFlashCardMenu();
                     Console.ReadLine();
                     break;
                 case "Exit Program":
