@@ -121,11 +121,11 @@ public class DeckMenu()
             {
                 return;
             }
-
+            
             var deckNames = decks.Select(d => $"{d.Id}: {d.DeckName}").ToList();
             var selectedDeck = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
-                    .Title("Select the deck you would like to edit:")
+                    .Title("Select the deck you would like to Delete:")
                     .PageSize(10)
                     .AddChoices(deckNames)
             );
@@ -138,9 +138,13 @@ public class DeckMenu()
             
             if (confirmation.ToLower() == "y")
             {
+                var flashCards = context.FlashCards.Where(fc => fc.DeckId == deckId).ToList();
+                var studySessions = context.StudySessions.Where(ss => ss.DeckStudiedId == deckId).ToList();
+
+                context.FlashCards.RemoveRange(flashCards);
+                context.StudySessions.RemoveRange(studySessions);
                 context.Decks.Remove(deck);
                 context.SaveChanges();
-
 
                 AnsiConsole.WriteLine($"Deck '{deck.DeckName}' deleted successfully. Press enter to continue.");
                 Console.ReadLine();

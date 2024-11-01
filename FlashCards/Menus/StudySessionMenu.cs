@@ -14,6 +14,7 @@ public class StudySessionMenu
         {
             Console.Clear();
             AnsiConsole.Markup("[bold blue]Welcome to Study Sessions![/]\n");
+            AnsiConsole.Markup("[blue]Study Sessions can not be edited or deleted.[/]\n");
             AnsiConsole.Markup("[blue]Please select from the following options[/]\n");
             var selection = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
@@ -98,20 +99,19 @@ public class StudySessionMenu
                 return;
             }
 
-            var deckIds = decks.Select(d => d.Id).ToList();
-            var selectedDeckId = AnsiConsole.Prompt(
+            var deckNames = decks.Select(d => $"{d.Id}: {d.DeckName}").ToList();
+            var selectedDeck = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
-                    .Title("Select the deck you would like to edit:")
+                    .Title("Select the deck you would like to Delete:")
                     .PageSize(10)
-                    .AddChoices(deckIds.Select(id => id.ToString()))
+                    .AddChoices(deckNames)
             );
-            
-            var deckId = int.Parse(selectedDeckId);
-            var selectedDeck = decks.FirstOrDefault(d => d.Id == deckId);
+            int deckId = int.Parse(selectedDeck.Split(':')[0]);
+            var selectedDeckObject = decks.FirstOrDefault(d => d.Id == deckId);
             var studySessions = GetStudySessions(deckId);
             if (studySessions.Count == 0)
             {
-                AnsiConsole.WriteLine($"No Study Sessions available for {selectedDeck.DeckName}. Press enter to continue.");
+                AnsiConsole.WriteLine($"No Study Sessions available for {selectedDeckObject.DeckName}. Press enter to continue.");
                 Console.ReadLine();
                 return;
             }
@@ -124,7 +124,7 @@ public class StudySessionMenu
             foreach (var studySession in studySessions)
             {
                 percentCorrect = (decimal)studySession.NumberCorrect / studySession.NumberAsked * 100;
-                table.AddRow(studySession.Id.ToString(), selectedDeck.DeckName,
+                table.AddRow(studySession.Id.ToString(), selectedDeckObject.DeckName,
                     studySession.NumberAsked.ToString(),
                     studySession.NumberCorrect.ToString(), percentCorrect.ToString("0.00") + "%");
             }
@@ -135,7 +135,7 @@ public class StudySessionMenu
         Console.ReadLine();
     }
 
-    private static List<StudySession> GetStudySessions(int deckid)
+    public static List<StudySession> GetStudySessions(int deckid)
     {
         using (var context = new FlashCardsContext())
         {
