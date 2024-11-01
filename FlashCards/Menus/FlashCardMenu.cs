@@ -6,6 +6,9 @@ namespace FlashCards.Menus;
 
 public class FlashCardMenu()
 {
+    /// <summary>
+    /// Displays the FlashCard menu and handles user selections for adding, deleting, editing, and viewing FlashCards.
+    /// </summary>
     public static void DisplayFlashCardMenu()
     {
         var continueProgram = true;
@@ -36,13 +39,7 @@ public class FlashCardMenu()
                     EditFlashCard();
                     break;
                 case "View FlashCards":
-                    DeckMenu.ViewDecks();
-                    var deckId = AnsiConsole.Ask<int>("Which Deck ID would you like to view FlashCards for?");
-                    var flashCards = GetFlashCards(deckId);
-                    ViewFlashCards(flashCards);
-                    AnsiConsole.WriteLine("Press enter to continue.");
-                    Console.ReadLine();
-                    break;
+                    GetAndViewFlashCards();
                     break;
                 case "Return to Main Menu":
                     continueProgram = false;
@@ -53,6 +50,9 @@ public class FlashCardMenu()
         }
     }
 
+    /// <summary>
+    /// retrieves and displays FlashCards for a selected deck
+    /// </summary>
     private static void GetAndViewFlashCards()
     {
         DeckMenu.ViewDecks();
@@ -66,8 +66,13 @@ public class FlashCardMenu()
         }
 
         ViewFlashCards(flashCards);
+        AnsiConsole.WriteLine("Press enter to continue.");
+        Console.ReadLine();
     }
 
+    /// <summary>
+    /// Menu for adding a new FlashCard to an existing deck or a new deck.
+    /// </summary>
     public static void AddFlashCardMenu()
     {
         var continueProgram = true;
@@ -105,6 +110,9 @@ public class FlashCardMenu()
         }
     }
 
+    /// <summary>
+    /// Adds a new Deck then calls AddToExistingDeck to add a FlashCard to the new Deck.
+    /// </summary>
     private static void AddToANewDeck()
     {
         DeckMenu.AddDeck();
@@ -112,6 +120,9 @@ public class FlashCardMenu()
         AddToExistingDeck();
     }
 
+    /// <summary>
+    /// Adds a new FlashCard to an existing Deck.
+    /// </summary>
     private static void AddToExistingDeck()
     {
         var deckId = AnsiConsole.Ask<int>("Enter the Deck Id for the new FlashCard: ");
@@ -133,6 +144,9 @@ public class FlashCardMenu()
         Console.ReadLine();
     }
 
+    /// <summary>
+    /// Deletes a FlashCard from the database.
+    /// </summary>
     public static void DeleteFlashCard()
     {
         DeckMenu.ViewDecks();
@@ -156,6 +170,9 @@ public class FlashCardMenu()
         Console.ReadLine();
     }
 
+    /// <summary>
+    /// Edits a FlashCard in the database.
+    /// </summary>
     public static void EditFlashCard()
     {
         DeckMenu.ViewDecks();
@@ -183,6 +200,13 @@ public class FlashCardMenu()
         Console.ReadLine();
     }
 
+    /// <summary>
+    /// gets all FlashCards for a given deck
+    /// </summary>
+    /// <param name="deckId"></param>
+    /// <returns>
+    /// dictionary of FlashCards for a given deck
+    /// </returns>
     public static Dictionary<int, FlashCard> GetFlashCards(int deckId)
     {
         using (var context = new FlashCardsContext())
@@ -196,6 +220,13 @@ public class FlashCardMenu()
         }
     }
 
+    /// <summary>
+    /// Displays FlashCards in a table format
+    /// </summary>
+    /// <param name="flashCards"></param>
+    /// <returns>
+    /// Dictionary of FlashCards
+    /// </returns>
     public static Dictionary<int, FlashCard> ViewFlashCards(Dictionary<int, FlashCard> flashCards)
     {
         var table = new Table();

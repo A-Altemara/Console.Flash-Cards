@@ -6,6 +6,9 @@ namespace FlashCards.Menus;
 
 public class DeckMenu()
 {
+    /// <summary>
+    /// Displays the Deck menu and handles user selections for adding, deleting, editing, and viewing decks.
+    /// </summary>
     public static void DisplayDecksMenu()
     {
         var continueProgram = true;
@@ -49,6 +52,12 @@ public class DeckMenu()
         }
     }
 
+    /// <summary>
+    /// displays all decks in the database
+    /// </summary>
+    /// <returns>
+    /// list of all decks in the database
+    /// </returns>
     public static List<Deck> ViewDecks()
     {
         using (var context = new FlashCardsContext())
@@ -77,6 +86,9 @@ public class DeckMenu()
         }
     }
 
+    /// <summary>
+    /// Edits the name of a deck in the database
+    /// </summary>
     private static void EditDeck()
     {
         using (var context = new FlashCardsContext())
@@ -111,6 +123,9 @@ public class DeckMenu()
         }
     }
 
+    /// <summary>
+    /// Deletes a deck, and all associated Study Sessions and Flash Cards from the database
+    /// </summary>
     private static void DeleteDeck()
     {
         using (var context = new FlashCardsContext())
@@ -158,6 +173,9 @@ public class DeckMenu()
         }
     }
 
+    /// <summary>
+    /// adds a new deck to the database
+    /// </summary>
     public static void AddDeck()
     {
         Console.Clear();

@@ -6,6 +6,10 @@ namespace FlashCards.Menus;
 
 public class StudySessionMenu
 {
+    /// <summary>
+    /// Displays the FlashCard menu and handles user selections for studying flashcards, viewing all study sessions, 
+    /// viewing deck-specific study sessions, or returning to the main menu.
+    /// </summary>
     public static void DisplayFlashCardMenu()
     {
         var continueProgram = true;
@@ -35,7 +39,7 @@ public class StudySessionMenu
                     ViewAllStudySessions();
                     break;
                 case "View Deck specific Study sessions":
-                    ViewStudySessions();
+                    ViewDeckSpecificStudySessions();
                     break;
                 case "Return to Main Menu":
                     continueProgram = false;
@@ -45,6 +49,9 @@ public class StudySessionMenu
         }
     }
 
+    /// <summary>
+    /// Displays all study sessions for all decks.
+    /// </summary>
     private static void ViewAllStudySessions()
     {
         using (var context = new FlashCardsContext())
@@ -69,7 +76,8 @@ public class StudySessionMenu
                 var selectedDeck = decks.FirstOrDefault(d => d.Id == deckid);
                 if (studySessions.Count == 0)
                 {
-                    AnsiConsole.WriteLine($"No Study Sessions available for {selectedDeck.DeckName} Press enter to continue.");
+                    AnsiConsole.WriteLine(
+                        $"No Study Sessions available for {selectedDeck.DeckName} Press enter to continue.");
                     Console.ReadLine();
                 }
 
@@ -84,11 +92,15 @@ public class StudySessionMenu
 
             AnsiConsole.Write(table);
         }
+
         AnsiConsole.WriteLine("Press enter to continue.");
         Console.ReadLine();
     }
 
-    private static void ViewStudySessions()
+    /// <summary>
+    /// displays all study sessions for a specific deck.
+    /// </summary>
+    private static void ViewDeckSpecificStudySessions()
     {
         using (var context = new FlashCardsContext())
         {
@@ -111,7 +123,8 @@ public class StudySessionMenu
             var studySessions = GetStudySessions(deckId);
             if (studySessions.Count == 0)
             {
-                AnsiConsole.WriteLine($"No Study Sessions available for {selectedDeckObject.DeckName}. Press enter to continue.");
+                AnsiConsole.WriteLine(
+                    $"No Study Sessions available for {selectedDeckObject.DeckName}. Press enter to continue.");
                 Console.ReadLine();
                 return;
             }
@@ -131,10 +144,18 @@ public class StudySessionMenu
 
             AnsiConsole.Write(table);
         }
+
         AnsiConsole.WriteLine("Press enter to continue.");
         Console.ReadLine();
     }
 
+    /// <summary>
+    ///  Retrieves all study sessions for a specific deck.
+    /// </summary>
+    /// <param name="deckid"></param>
+    /// <returns>
+    /// list of study sessions for a specific deck.
+    /// </returns>
     public static List<StudySession> GetStudySessions(int deckid)
     {
         using (var context = new FlashCardsContext())
@@ -146,6 +167,9 @@ public class StudySessionMenu
         }
     }
 
+    /// <summary>
+    /// Creates randomized list of flashcards from a selected deck and prompts the user to answer each flashcard.
+    /// </summary>
     private static void StudyFlashCards()
     {
         Random random = new Random();
@@ -164,7 +188,7 @@ public class StudySessionMenu
                 .PageSize(10)
                 .AddChoices(deckLookup.Keys)
         );
-            
+
         var selectedDeck = deckLookup[selectedDeckKey];
         var studySession = new StudySession { DeckStudied = selectedDeck };
 

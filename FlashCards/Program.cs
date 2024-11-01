@@ -5,7 +5,10 @@ namespace FlashCards;
 
 class Program
 {
-    static void Main(string[] args)
+    /// <summary>
+    /// Entry point for the FlashCards program. Displays the main menu and handles user selections.
+    /// </summary>
+    static void Main()
     {
         var continueProgram = true;
 
