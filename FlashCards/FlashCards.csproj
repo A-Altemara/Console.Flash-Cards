@@ -24,6 +24,9 @@
 
     <ItemGroup>
       <None Include="bin\debug\net8.0\appsettings.json" />
+      <None Update="Demos\DemoCards.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
