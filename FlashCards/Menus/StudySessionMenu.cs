@@ -82,6 +82,7 @@ public static class StudySessionMenu
                 if (studySessions.Count == 0)
                 {
                     AnsiConsole.Markup($"[Red]No Study Sessions available for {selectedDeck.DeckName}.[/]\n");
+                    continue;
                 }
 
                 foreach (var studySession in studySessions)
