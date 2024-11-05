@@ -25,7 +25,7 @@ public class DeckMenu()
                     .PageSize(5)
                     .MoreChoicesText("[grey](Move up and down to reveal more options)[/]")
                     .AddChoices([
-                        "Add Deck", "Add Demo Stacks", "Delete Deck", "Edit Deck", "View Decks", "Return to Main Menu"
+                        "Add Deck", "Add Demo Decks", "Delete Deck", "Edit Deck", "View Decks", "Return to Main Menu"
                     ]));
 
             switch (selection)
@@ -33,7 +33,7 @@ public class DeckMenu()
                 case "Add Deck":
                     AddDeck();
                     break;
-                case "Add Demo Stacks":
+                case "Add Demo Decks":
                     await DemoStackBuilder.ImportDemoStack();
                     break;
                 case "Delete Deck":
