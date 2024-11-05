@@ -9,7 +9,7 @@ class Program
     /// <summary>
     /// Entry point for the FlashCards program. Displays the main menu and handles user selections.
     /// </summary>
-    static void Main()
+    static async Task Main()
     {
         var continueProgram = true;
 
@@ -41,7 +41,7 @@ class Program
                     Console.ReadLine();
                     break;
                 case "Add Demo Stacks":
-                    DemoStackBuilder.ImportDemoStack();
+                    await DemoStackBuilder.ImportDemoStack();
                     break;
                 case "Exit Program":
                     continueProgram = false;

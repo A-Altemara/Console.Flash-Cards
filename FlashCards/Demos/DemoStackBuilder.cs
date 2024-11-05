@@ -15,43 +15,50 @@ public class DemoStackBuilder
             AnsiConsole.Markup("[red]DemoCards.json not found![/]");
             return;
         }
-       
+
         var json = await File.ReadAllTextAsync(path);
         var demoStack = JsonSerializer.Deserialize<List<Deck>>(json);
-        if(demoStack is null)
+        if (demoStack is null)
         {
             AnsiConsole.Markup("[red]Failed to deserialize DemoCards.json![/]");
             return;
         }
 
-        foreach (var deck in demoStack)
+        await using (var context = new FlashCardsContext())
         {
-            var addedDeck = await AddDeck(deck);
-            if (addedDeck is null)
+            foreach (var deck in demoStack)
             {
-                AnsiConsole.Markup("[red]Failed to add Deck.[/]");
-                AnsiConsole.WriteLine("press enter to continue.");
-                Console.ReadLine();
-                continue;
+                if (context.Decks.Any(d => d.DeckName == deck.DeckName))
+                {
+                    AnsiConsole.Markup($"[yellow]Deck '{deck.DeckName}' already exists. Skipping...[/]\n");
+                    continue;
+                }
+
+                var addedDeck = await AddDeck(context, deck);
+                if (addedDeck is null)
+                {
+                    AnsiConsole.Markup("[red]Failed to add Deck.[/]");
+                    AnsiConsole.WriteLine("Press enter to continue.");
+                    Console.ReadLine();
+                    continue;
+                }
+                else
+                {
+                    AnsiConsole.Markup($"[green]Added {addedDeck.DeckName} and cards to the database![/]");
+                }
             }
-            else
-            {
-                AnsiConsole.Markup($"[green]Added {addedDeck.DeckName} and cards to the database![/]");
-            }
+
             AnsiConsole.WriteLine("Demo Decks added to the database. Press Enter to continue.");
             Console.ReadLine();
         }
     }
 
-    private static async Task<Deck> AddDeck(Deck deck)
+    private static async Task<Deck> AddDeck(FlashCardsContext context, Deck deck)
     {
-        await using (var context = new FlashCardsContext())
-        {
-            var newDeck = new Deck { DeckName = deck.DeckName, FlashCards = deck.FlashCards };
-            context.Decks.Add(newDeck);
-            context.FlashCards.AddRange(deck.FlashCards);
-            await context.SaveChangesAsync();
-        }
-        return deck;
+        var newDeck = new Deck { DeckName = deck.DeckName, FlashCards = deck.FlashCards };
+        context.Decks.Add(newDeck);
+        context.FlashCards.AddRange(deck.FlashCards);
+        await context.SaveChangesAsync();
+        return newDeck;
     }
 }
