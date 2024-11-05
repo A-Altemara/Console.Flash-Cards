@@ -1,10 +1,11 @@
 using FlashCards.Context;
+using FlashCards.Demos;
 using FlashCards.Models;
 using Spectre.Console;
 
 namespace FlashCards.Menus;
 
-public class StudySessionMenu
+public static class StudySessionMenu
 {
     /// <summary>
     /// Displays the FlashCard menu and handles user selections for studying flashcards, viewing all study sessions, 
@@ -26,7 +27,8 @@ public class StudySessionMenu
                     .PageSize(5)
                     .MoreChoicesText("[grey](Move up and down to reveal more options)[/]")
                     .AddChoices([
-                        "Study FlashCards", "View All Study Sessions", "View Deck specific Study sessions",
+                        "Study FlashCards", "Add Demo Study Sessions", "View All Study Sessions",
+                        "View Deck specific Study sessions",
                         "Return to Main Menu"
                     ]));
 
@@ -34,6 +36,9 @@ public class StudySessionMenu
             {
                 case "Study FlashCards":
                     StudyFlashCards();
+                    break;
+                case "Add Demo Study Sessions":
+                    DemoStudySessionBuilder.BuildRandomStudySessions();
                     break;
                 case "View All Study Sessions":
                     ViewAllStudySessions();
@@ -67,18 +72,16 @@ public class StudySessionMenu
 
             var deckIds = decks.Select(d => d.Id).ToList();
 
-            var table = new Table();
-            table.AddColumns("ID", "Deck Name", "Number Asked", "Number Correct", "Percent Correct");
-
             foreach (var deckid in deckIds)
             {
+                var table = new Table();
+                table.AddColumns("ID", "Deck Name", "Number Asked", "Number Correct", "Percent Correct");
+
                 var studySessions = GetStudySessions(deckid);
                 var selectedDeck = decks.FirstOrDefault(d => d.Id == deckid);
                 if (studySessions.Count == 0)
                 {
-                    AnsiConsole.WriteLine(
-                        $"No Study Sessions available for {selectedDeck.DeckName} Press enter to continue.");
-                    Console.ReadLine();
+                    AnsiConsole.Markup($"[Red]No Study Sessions available for {selectedDeck.DeckName}.[/]\n");
                 }
 
                 foreach (var studySession in studySessions)
@@ -88,9 +91,9 @@ public class StudySessionMenu
                         studySession.NumberAsked.ToString(),
                         studySession.NumberCorrect.ToString(), percentCorrect.ToString("0.00") + "%");
                 }
-            }
 
-            AnsiConsole.Write(table);
+                AnsiConsole.Write(table);
+            }
         }
 
         AnsiConsole.WriteLine("Press enter to continue.");
@@ -123,9 +126,7 @@ public class StudySessionMenu
             var studySessions = GetStudySessions(deckId);
             if (studySessions.Count == 0)
             {
-                AnsiConsole.WriteLine(
-                    $"No Study Sessions available for {selectedDeckObject.DeckName}. Press enter to continue.");
-                Console.ReadLine();
+                AnsiConsole.WriteLine($"No Study Sessions available for {selectedDeckObject.DeckName}.");
                 return;
             }
 

@@ -1,4 +1,5 @@
 using FlashCards.Context;
+using FlashCards.Demos;
 using FlashCards.Models;
 using Spectre.Console;
 
@@ -9,7 +10,7 @@ public class DeckMenu()
     /// <summary>
     /// Displays the Deck menu and handles user selections for adding, deleting, editing, and viewing decks.
     /// </summary>
-    public static void DisplayDecksMenu()
+    public static async Task DisplayDecksMenu()
     {
         var continueProgram = true;
 
@@ -24,13 +25,16 @@ public class DeckMenu()
                     .PageSize(5)
                     .MoreChoicesText("[grey](Move up and down to reveal more options)[/]")
                     .AddChoices([
-                        "Add Deck", "Delete Deck", "Edit Deck", "View Decks", "Return to Main Menu"
+                        "Add Deck", "Add Demo Stacks", "Delete Deck", "Edit Deck", "View Decks", "Return to Main Menu"
                     ]));
 
             switch (selection)
             {
                 case "Add Deck":
                     AddDeck();
+                    break;
+                case "Add Demo Stacks":
+                    await DemoStackBuilder.ImportDemoStack();
                     break;
                 case "Delete Deck":
                     DeleteDeck();

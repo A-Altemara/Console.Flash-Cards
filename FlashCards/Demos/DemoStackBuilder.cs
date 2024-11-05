@@ -7,6 +7,9 @@ namespace FlashCards.Demos;
 
 public class DemoStackBuilder
 {
+    /// <summary>
+    /// Imports the DemoCards.json file and adds the demo decks to the database. 
+    /// </summary>
     public static async Task ImportDemoStack()
     {
         var path = Path.Combine(Directory.GetCurrentDirectory(), "Demos/DemoCards.json");
@@ -53,6 +56,12 @@ public class DemoStackBuilder
         }
     }
 
+    /// <summary>
+    /// Adds a deck and all associated flashcards to the database.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="deck"></param>
+    /// <returns> A task that represents the Asynchronous Process </returns>
     private static async Task<Deck> AddDeck(FlashCardsContext context, Deck deck)
     {
         var newDeck = new Deck { DeckName = deck.DeckName, FlashCards = deck.FlashCards };

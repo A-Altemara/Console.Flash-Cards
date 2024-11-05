@@ -1,15 +1,14 @@
-﻿using FlashCards.Demos;
-using FlashCards.Menus;
+﻿using FlashCards.Menus;
 using Spectre.Console;
     
 namespace FlashCards;
 
-class Program
+public static class Program
 {
     /// <summary>
     /// Entry point for the FlashCards program. Displays the main menu and handles user selections.
     /// </summary>
-    static async Task Main()
+    private static async Task Main()
     {
         var continueProgram = true;
 
@@ -25,7 +24,7 @@ class Program
                     .PageSize(5)
                     .MoreChoicesText("[grey](Move up and down to reveal more options)[/]")
                     .AddChoices([
-                        "Manage Flash Cards", "Manage Decks", "Study Menu", "Add Demo Stacks", "Exit Program"
+                        "Manage Flash Cards", "Manage Decks", "Study Menu", "Exit Program"
                     ]));
 
             switch (selection)
@@ -34,14 +33,11 @@ class Program
                     FlashCardMenu.DisplayFlashCardMenu();
                     break;
                 case "Manage Decks":
-                    DeckMenu.DisplayDecksMenu();
+                   await DeckMenu.DisplayDecksMenu();
                     break;
                 case "Study Menu":
                     StudySessionMenu.DisplayFlashCardMenu();
                     Console.ReadLine();
-                    break;
-                case "Add Demo Stacks":
-                    await DemoStackBuilder.ImportDemoStack();
                     break;
                 case "Exit Program":
                     continueProgram = false;
