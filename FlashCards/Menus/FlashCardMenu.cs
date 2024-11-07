@@ -136,6 +136,13 @@ public class FlashCardMenu()
         };
         using (var context = new FlashCardsContext())
         {
+            var flashCards = GetFlashCards(deckId);
+            if (flashCards.Values.Any(fc=>fc.Question == question))
+            {
+                AnsiConsole.WriteLine("FlashCard already exists in this deck. Press enter to continue.");
+                Console.ReadLine();
+                return;
+            }
             context.FlashCards.Add(flashCard);
             context.SaveChanges();
         }
@@ -191,6 +198,14 @@ public class FlashCardMenu()
         var newAnswer = AnsiConsole.Ask<string>("Enter the new answer for the FlashCard: ");
         using (var context = new FlashCardsContext())
         {
+            flashCards = GetFlashCards(deckId);
+            if (flashCards.Values.Any(fc=>fc.Question == newQuestion))
+            {
+                AnsiConsole.WriteLine("FlashCard already exists in this deck. Press enter to continue.");
+                Console.ReadLine();
+                return;
+            }
+            
             flashCard.Question = newQuestion;
             flashCard.Answer = newAnswer;
             context.FlashCards.Update(flashCard);
@@ -205,7 +220,7 @@ public class FlashCardMenu()
     /// </summary>
     /// <param name="deckId"></param>
     /// <returns>
-    /// dictionary of FlashCards for a given deck
+    /// dictionary of FlashCards for a given deck with keys as the display index
     /// </returns>
     public static Dictionary<int, FlashCard> GetFlashCards(int deckId)
     {

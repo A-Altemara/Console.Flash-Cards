@@ -95,36 +95,40 @@ public class DeckMenu()
     /// </summary>
     private static void EditDeck()
     {
-        using (var context = new FlashCardsContext())
+        using var context = new FlashCardsContext();
+        var decks = context.Decks.ToList();
+
+        if (decks.Count == 0)
         {
-            var decks = context.Decks.ToList();
-
-            if (decks.Count == 0)
-            {
-                return;
-            }
-
-            var deckNames = decks.Select(d => $"{d.Id}: {d.DeckName}").ToList();
-            var selectedDeck = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                    .Title("Select the deck you would like to edit:")
-                    .PageSize(10)
-                    .AddChoices(deckNames)
-            );
-
-            int deckId = int.Parse(selectedDeck.Split(':')[0]);
-            var deck = decks.FirstOrDefault(d => d.Id == deckId);
-            
-            AnsiConsole.WriteLine("Enter the new name for the deck:");
-            string newDeckName = Console.ReadLine();
-
-            deck.DeckName = newDeckName;
-            context.Decks.Update(deck);
-            context.SaveChanges();
-            
-            AnsiConsole.WriteLine($"Deck '{deck.DeckName}' updated successfully. Press enter to continue.");
-            Console.ReadLine();
+            return;
         }
+
+        var deckNames = decks.Select(d => $"{d.Id}: {d.DeckName}").ToList();
+        var selectedDeck = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .Title("Select the deck you would like to edit:")
+                .PageSize(10)
+                .AddChoices(deckNames)
+        );
+
+        int deckId = int.Parse(selectedDeck.Split(':')[0]);
+        var deck = decks.FirstOrDefault(d => d.Id == deckId);
+
+        string newDeckName = AnsiConsole.Ask<string>("Enter the new name for the deck. Note Deck Names are Case Sensitive.");
+
+        if (decks.Any(d => d.DeckName == newDeckName))
+        {
+            AnsiConsole.WriteLine("Deck already exists. Press enter to continue.");
+            Console.ReadLine();
+            return;
+        }
+
+        deck.DeckName = newDeckName;
+        context.Decks.Update(deck);
+        context.SaveChanges();
+
+        AnsiConsole.WriteLine($"Deck '{deck.DeckName}' updated successfully. Press enter to continue.");
+        Console.ReadLine();
     }
 
     /// <summary>
@@ -140,7 +144,7 @@ public class DeckMenu()
             {
                 return;
             }
-            
+
             var deckNames = decks.Select(d => $"{d.Id}: {d.DeckName}").ToList();
             var selectedDeck = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
@@ -151,10 +155,10 @@ public class DeckMenu()
             int deckId = int.Parse(selectedDeck.Split(':')[0]);
             var deck = decks.FirstOrDefault(d => d.Id == deckId);
 
-            string confirmation =AnsiConsole.Ask<string>(
+            string confirmation = AnsiConsole.Ask<string>(
                 $"Are you sure you want to delete the deck '{deck.DeckName}'? " +
                 $"This will delete all associated flash cards and study sessions. (Y/N)");
-            
+
             if (confirmation.ToLower() == "y")
             {
                 var flashCards = context.FlashCards.Where(fc => fc.DeckId == deckId).ToList();
@@ -183,10 +187,17 @@ public class DeckMenu()
     public static void AddDeck()
     {
         Console.Clear();
-        AnsiConsole.WriteLine("Enter the name of the new deck:");
-        string deckName = Console.ReadLine();
+        string deckName = AnsiConsole.Ask<string>("Enter the name of the new deck. Note Deck Names are Case Sensitive.");
         using (var context = new FlashCardsContext())
         {
+            var decks = context.Decks.ToList();
+            if (decks.Any(d => d.DeckName == deckName))
+            {
+                AnsiConsole.WriteLine("Deck already exists. Press enter to continue.");
+                Console.ReadLine();
+                return;
+            }
+
             var newDeck = new Deck { DeckName = deckName };
             context.Decks.Add(newDeck);
             context.SaveChanges();
