@@ -27,7 +27,7 @@ public class DemoStudySessionBuilder
             return;
         }
 
-        AnsiConsole.Markup("[green]Decks found in the database. Generating random study sessions...[/]");
+        AnsiConsole.Markup("\n[green]Decks found in the database. Generating random study sessions...[/]\n");
         foreach (var deckId in deckIds)
         {
             using var context = new FlashCardsContext();
@@ -51,12 +51,14 @@ public class DemoStudySessionBuilder
             {
                 var numberQuestionsAsked = Random.Next(1, deck.FlashCards.Count);
                 var numberAnswersCorrect = numberQuestionsAsked > 0 ? Random.Next(0, numberQuestionsAsked + 1) : 0;
+                var randomStudyDate = DateTime.Now.AddDays(-Random.Next(1, 365));
                 var studySession = new StudySession
                 {
                     NumberAsked = numberQuestionsAsked,
                     NumberCorrect = numberAnswersCorrect,
                     DeckStudiedId = deckId,
-                    DeckStudied = deck
+                    DeckStudied = deck,
+                    DateStudied = randomStudyDate
                 };
 
                 studySessions.Add(studySession);

@@ -40,18 +40,18 @@ public class DemoStackBuilder
                 var addedDeck = await AddDeck(context, deck);
                 if (addedDeck is null)
                 {
-                    AnsiConsole.Markup("[red]Failed to add Deck.[/]");
+                    AnsiConsole.Markup("[red]Failed to add Deck.[/]\n");
                     AnsiConsole.WriteLine("Press enter to continue.");
                     Console.ReadLine();
                     continue;
                 }
                 else
                 {
-                    AnsiConsole.Markup($"[green]Added {addedDeck.DeckName} and cards to the database![/]");
+                    AnsiConsole.Markup($"[green]Added {addedDeck.DeckName} and cards to the database![/]\n");
                 }
             }
 
-            AnsiConsole.WriteLine("Demo Decks added to the database. Press Enter to continue.");
+            AnsiConsole.WriteLine("\nDemo Decks added to the database. Press Enter to continue.");
             Console.ReadLine();
         }
     }

@@ -7,4 +7,5 @@ public class StudySession
     public int NumberCorrect { get; set; }
     public int DeckStudiedId { get; set; } 
     public required Deck DeckStudied { get; set; }
-}
+    public DateTime DateStudied { get; set; }
+}               
