@@ -75,7 +75,7 @@ public static class StudySessionMenu
             foreach (var deckid in deckIds)
             {
                 var table = new Table();
-                table.AddColumns("ID", "Deck Name", "Date Studied", "Number Asked", "Number Correct", "Percent Correct");
+                table.AddColumns("ID", "Deck Name", "Date Studied DD/MM/YYY", "Number Asked", "Number Correct", "Percent Correct");
 
                 var studySessions = GetStudySessions(deckid);
                 var selectedDeck = decks.FirstOrDefault(d => d.Id == deckid);
@@ -135,7 +135,7 @@ public static class StudySessionMenu
             decimal percentCorrect;
 
             var table = new Table();
-            table.AddColumns("Study Session ID", "Deck Name", "Date Studied", "Number Asked", "Number Correct", "Percent Correct");
+            table.AddColumns("Study Session ID", "Deck Name", "Date Studied DD/MM/YYY", "Number Asked", "Number Correct", "Percent Correct");
 
             foreach (var studySession in studySessions)
             {
@@ -223,6 +223,9 @@ public static class StudySessionMenu
             AnsiConsole.WriteLine("press enter to continue");
             Console.ReadLine();
         }
+        
+        AnsiConsole.WriteLine($"You have completed the study session. You scored {(decimal)studySession.NumberCorrect/studySession.NumberAsked:P2}  Press enter to continue.");
+        Console.ReadLine();
         
         studySession.DateStudied = DateTime.Now;
         studySession.DeckStudied = selectedDeck;
