@@ -55,9 +55,18 @@ public class FlashCardMenu()
     /// </summary>
     private static void GetAndViewFlashCards()
     {
-        DeckMenu.ViewDecks();
-        var deckId = AnsiConsole.Ask<int>("Which Deck ID would you like to view FlashCards for?");
+        using var context = new FlashCardsContext();
+        var decks = context.Decks.ToList();
+
+        if (decks.Count == 0)
+        {
+            return;
+        }
+        
+        var selectedDeck = DeckMenu.GetDeckSelection(decks);
+        int deckId = int.Parse(selectedDeck.Split(':')[0]);
         var flashCards = GetFlashCards(deckId);
+        
         if (flashCards.Count == 0)
         {
             AnsiConsole.WriteLine("No FlashCards available for this deck. Press enter to continue.");
@@ -116,7 +125,6 @@ public class FlashCardMenu()
     private static void AddToANewDeck()
     {
         DeckMenu.AddDeck();
-        DeckMenu.ViewDecks();
         AddToExistingDeck();
     }
 
@@ -125,7 +133,16 @@ public class FlashCardMenu()
     /// </summary>
     private static void AddToExistingDeck()
     {
-        var deckId = AnsiConsole.Ask<int>("Enter the Deck Id for the new FlashCard: ");
+        using var context = new FlashCardsContext();
+        var decks = context.Decks.ToList();
+
+        if (decks.Count == 0)
+        {
+            return;
+        }
+        
+        var selectedDeck = DeckMenu.GetDeckSelection(decks);
+        int deckId = int.Parse(selectedDeck.Split(':')[0]);
         var question = AnsiConsole.Ask<string>("Enter the question for the new FlashCard: ");
         var answer = AnsiConsole.Ask<string>("Enter the answer for the new FlashCard: ");
         var flashCard = new FlashCard
@@ -134,18 +151,15 @@ public class FlashCardMenu()
             Answer = answer,
             DeckId = deckId
         };
-        using (var context = new FlashCardsContext())
+        var flashCards = GetFlashCards(deckId);
+        if (flashCards.Values.Any(fc=>fc.Question == question))
         {
-            var flashCards = GetFlashCards(deckId);
-            if (flashCards.Values.Any(fc=>fc.Question == question))
-            {
-                AnsiConsole.WriteLine("FlashCard already exists in this deck. Press enter to continue.");
-                Console.ReadLine();
-                return;
-            }
-            context.FlashCards.Add(flashCard);
-            context.SaveChanges();
+            AnsiConsole.WriteLine("FlashCard already exists in this deck. Press enter to continue.");
+            Console.ReadLine();
+            return;
         }
+        context.FlashCards.Add(flashCard);
+        context.SaveChanges();
 
         AnsiConsole.WriteLine("FlashCard added successfully. Press enter to continue.");
         Console.ReadLine();
@@ -156,23 +170,42 @@ public class FlashCardMenu()
     /// </summary>
     public static void DeleteFlashCard()
     {
-        DeckMenu.ViewDecks();
-        var deckId = AnsiConsole.Ask<int>("What Deck would you like to delete a FlashCard from?");
+        using var context = new FlashCardsContext();
+        var decks = context.Decks.ToList();
+
+        if (decks.Count == 0)
+        {
+            return;
+        }
+        
+        var selectedDeck = DeckMenu.GetDeckSelection(decks);
+        int deckId = int.Parse(selectedDeck.Split(':')[0]);
         var flashCards = GetFlashCards(deckId);
-        var flashCardLookup = ViewFlashCards(flashCards);
-        var flashCardId = AnsiConsole.Ask<int>("Enter the Id of the FlashCard you would like to delete: ");
-        if (!flashCardLookup.TryGetValue(flashCardId, out var flashCard))
+        if (flashCards.Count == 0)
+        {
+            AnsiConsole.WriteLine("No FlashCards available for this deck. Press enter to continue.");
+            Console.ReadLine();
+            return;
+        }
+        
+        var flashCardDisplay = flashCards.Select(f => $"{f.Key}: {f.Value.Question}").ToList();
+        var selectedFlashCard = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .Title("Select the Flash Card you would like to Delete:")
+                .PageSize(10)
+                .AddChoices(flashCardDisplay)
+        );
+        
+        var flashCardId = int.Parse(selectedFlashCard.Split(':')[0]);
+        if (!flashCards.TryGetValue(flashCardId, out var flashCard))
         {
             AnsiConsole.WriteLine("FlashCard not found. Press enter to continue.");
             Console.ReadLine();
             return;
         }
 
-        using (var context = new FlashCardsContext())
-        {
-            context.FlashCards.Remove(flashCard);
-            context.SaveChanges();
-        }
+        context.FlashCards.Remove(flashCard);
+        context.SaveChanges();
         AnsiConsole.WriteLine("FlashCard deleted successfully. Press enter to continue.");
         Console.ReadLine();
     }
@@ -182,12 +215,34 @@ public class FlashCardMenu()
     /// </summary>
     public static void EditFlashCard()
     {
-        DeckMenu.ViewDecks();
-        var deckId = AnsiConsole.Ask<int>("What Deck would you like to edit a FlashCard from?");
+        using var context = new FlashCardsContext();
+        var decks = context.Decks.ToList();
+
+        if (decks.Count == 0)
+        {
+            return;
+        }
+        
+        var selectedDeck = DeckMenu.GetDeckSelection(decks);
+        int deckId = int.Parse(selectedDeck.Split(':')[0]);
         var flashCards = GetFlashCards(deckId);
-        var flashCardLookup = ViewFlashCards(flashCards);
-        var flashCardId = AnsiConsole.Ask<int>("Enter the Id of the FlashCard you would like to edit: ");
-        if (!flashCardLookup.TryGetValue(flashCardId, out var flashCard))
+        if (flashCards.Count == 0)
+        {
+            AnsiConsole.WriteLine("No FlashCards available for this deck. Press enter to continue.");
+            Console.ReadLine();
+            return;
+        }
+        
+        var flashCardDisplay = flashCards.Select(f => $"{f.Key}: {f.Value.Question}").ToList();
+        var selectedFlashCard = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .Title("Select the Flash Card you would like to Delete:")
+                .PageSize(10)
+                .AddChoices(flashCardDisplay)
+        );
+        
+        var flashCardId = int.Parse(selectedFlashCard.Split(':')[0]);
+        if (!flashCards.TryGetValue(flashCardId, out var flashCard))
         {
             AnsiConsole.WriteLine("FlashCard not found. Press enter to continue.");
             Console.ReadLine();
@@ -196,21 +251,17 @@ public class FlashCardMenu()
 
         var newQuestion = AnsiConsole.Ask<string>("Enter the new question for the FlashCard: ");
         var newAnswer = AnsiConsole.Ask<string>("Enter the new answer for the FlashCard: ");
-        using (var context = new FlashCardsContext())
+        if (flashCards.Values.Any(fc=>fc.Question == newQuestion))
         {
-            flashCards = GetFlashCards(deckId);
-            if (flashCards.Values.Any(fc=>fc.Question == newQuestion))
-            {
-                AnsiConsole.WriteLine("FlashCard already exists in this deck. Press enter to continue.");
-                Console.ReadLine();
-                return;
-            }
-            
-            flashCard.Question = newQuestion;
-            flashCard.Answer = newAnswer;
-            context.FlashCards.Update(flashCard);
-            context.SaveChanges();
+            AnsiConsole.WriteLine("FlashCard already exists in this deck. Press enter to continue.");
+            Console.ReadLine();
+            return;
         }
+            
+        flashCard.Question = newQuestion;
+        flashCard.Answer = newAnswer;
+        context.FlashCards.Update(flashCard);
+        context.SaveChanges();
         AnsiConsole.WriteLine("FlashCard updated successfully. Press enter to continue.");
         Console.ReadLine();
     }
@@ -224,15 +275,13 @@ public class FlashCardMenu()
     /// </returns>
     public static Dictionary<int, FlashCard> GetFlashCards(int deckId)
     {
-        using (var context = new FlashCardsContext())
-        {
-            var flashCards = context.FlashCards
-                .Where(fc => fc.DeckId == deckId)
-                .ToList();
-            return flashCards
-                .Select((fc, index) => new { Index = index + 1, FlashCard = fc })
-                .ToDictionary(item => item.Index, item => item.FlashCard);
-        }
+        using var context = new FlashCardsContext();
+        var flashCards = context.FlashCards
+            .Where(fc => fc.DeckId == deckId)
+            .ToList();
+        return flashCards
+            .Select((fc, index) => new { Index = index + 1, FlashCard = fc })
+            .ToDictionary(item => item.Index, item => item.FlashCard);
     }
 
     /// <summary>

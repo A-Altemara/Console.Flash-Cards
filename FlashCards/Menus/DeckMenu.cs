@@ -103,13 +103,7 @@ public class DeckMenu()
             return;
         }
 
-        var deckNames = decks.Select(d => $"{d.Id}: {d.DeckName}").ToList();
-        var selectedDeck = AnsiConsole.Prompt(
-            new SelectionPrompt<string>()
-                .Title("Select the deck you would like to edit:")
-                .PageSize(10)
-                .AddChoices(deckNames)
-        );
+        var selectedDeck = GetDeckSelection(decks);
 
         int deckId = int.Parse(selectedDeck.Split(':')[0]);
         var deck = decks.FirstOrDefault(d => d.Id == deckId);
@@ -131,6 +125,18 @@ public class DeckMenu()
         Console.ReadLine();
     }
 
+    public static string GetDeckSelection(List<Deck> decks)
+    {
+        var deckNames = decks.Select(d => $"{d.Id}: {d.DeckName}").ToList();
+        var selectedDeck = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .Title("Select the deck you would like to access:")
+                .PageSize(10)
+                .AddChoices(deckNames)
+        );
+        return selectedDeck;
+    }
+
     /// <summary>
     /// Deletes a deck, and all associated Study Sessions and Flash Cards from the database
     /// </summary>
@@ -145,13 +151,7 @@ public class DeckMenu()
                 return;
             }
 
-            var deckNames = decks.Select(d => $"{d.Id}: {d.DeckName}").ToList();
-            var selectedDeck = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                    .Title("Select the deck you would like to Delete:")
-                    .PageSize(10)
-                    .AddChoices(deckNames)
-            );
+            var selectedDeck = GetDeckSelection(decks);
             int deckId = int.Parse(selectedDeck.Split(':')[0]);
             var deck = decks.FirstOrDefault(d => d.Id == deckId);
 

@@ -197,7 +197,17 @@ public static class StudySessionMenu
         var studySession = new StudySession { DeckStudied = selectedDeck };
 
         var deckId = selectedDeck.Id;
-        var studySessionCount = AnsiConsole.Ask<int>("How many FlashCards would you like to study?");
+        int studySessionCount;
+        
+        do
+        {
+            studySessionCount = AnsiConsole.Ask<int >("How many FlashCards would you like to study?");
+            if (studySessionCount < 0)
+            {
+                AnsiConsole.Markup("[red]Invalid Entry. Please enter a number greater than 0.[/]\n");
+            }
+        } while (studySessionCount <= 0);
+        
         var flashCards = FlashCardMenu.GetFlashCards(deckId);
         var randomizedFlashCards = flashCards.Values.OrderBy(f => random.Next()).ToList();
 
@@ -216,7 +226,7 @@ public static class StudySessionMenu
             }
             else
             {
-                AnsiConsole.WriteLine("[red]Incorrect![/]\n");
+                AnsiConsole.Markup("[red]Incorrect![/]\n");
                 AnsiConsole.WriteLine($"The correct answer is: {flashCard.Answer}");
             }
 
