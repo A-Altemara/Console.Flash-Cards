@@ -107,47 +107,39 @@ public static class StudySessionMenu
     /// </summary>
     private static void ViewDeckSpecificStudySessions()
     {
-        using (var context = new FlashCardsContext())
+        using var context = new FlashCardsContext();
+        var decks = context.Decks.ToList();
+
+        if (decks.Count == 0)
         {
-            var decks = context.Decks.ToList();
-
-            if (decks.Count == 0)
-            {
-                return;
-            }
-
-            var deckNames = decks.Select(d => $"{d.Id}: {d.DeckName}").ToList();
-            var selectedDeck = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                    .Title("Select the deck you would like to Delete:")
-                    .PageSize(10)
-                    .AddChoices(deckNames)
-            );
-            int deckId = int.Parse(selectedDeck.Split(':')[0]);
-            var selectedDeckObject = decks.FirstOrDefault(d => d.Id == deckId);
-            var studySessions = GetStudySessions(deckId);
-            if (studySessions.Count == 0)
-            {
-                AnsiConsole.WriteLine($"No Study Sessions available for {selectedDeckObject.DeckName}.");
-                return;
-            }
-
-            decimal percentCorrect;
-
-            var table = new Table();
-            table.AddColumns("Study Session ID", "Deck Name", "Date Studied DD/MM/YYY", "Number Asked", "Number Correct", "Percent Correct");
-
-            foreach (var studySession in studySessions)
-            {
-                var studySessionDate = studySession.DateStudied.Day + "/" + studySession.DateStudied.Month + "/" + studySession.DateStudied.Year;
-                percentCorrect = (decimal)studySession.NumberCorrect / studySession.NumberAsked * 100;
-                table.AddRow(studySession.Id.ToString(), selectedDeckObject.DeckName,studySessionDate,
-                    studySession.NumberAsked.ToString(),
-                    studySession.NumberCorrect.ToString(), percentCorrect.ToString("0.00") + "%");
-            }
-
-            AnsiConsole.Write(table);
+            return;
         }
+
+        var selectedDeck = DeckMenu.GetDeckSelection(decks);
+        int deckId = int.Parse(selectedDeck.Split(':')[0]);
+        var deck = decks.FirstOrDefault(d => d.Id == deckId);
+        var studySessions = GetStudySessions(deckId);
+        if (studySessions.Count == 0)
+        {
+            AnsiConsole.WriteLine($"No Study Sessions available for {deck.DeckName}.");
+            return;
+        }
+
+        decimal percentCorrect;
+
+        var table = new Table();
+        table.AddColumns("Study Session ID", "Deck Name", "Date Studied DD/MM/YYY", "Number Asked", "Number Correct", "Percent Correct");
+
+        foreach (var studySession in studySessions)
+        {
+            var studySessionDate = studySession.DateStudied.Day + "/" + studySession.DateStudied.Month + "/" + studySession.DateStudied.Year;
+            percentCorrect = (decimal)studySession.NumberCorrect / studySession.NumberAsked * 100;
+            table.AddRow(studySession.Id.ToString(), deck.DeckName,studySessionDate,
+                studySession.NumberAsked.ToString(),
+                studySession.NumberCorrect.ToString(), percentCorrect.ToString("0.00") + "%");
+        }
+
+        AnsiConsole.Write(table);
 
         AnsiConsole.WriteLine("Press enter to continue.");
         Console.ReadLine();
@@ -185,18 +177,12 @@ public static class StudySessionMenu
             return;
         }
 
-        var deckLookup = decks.ToDictionary(d => $"{d.Id}: {d.DeckName}", d => d);
-        var selectedDeckKey = AnsiConsole.Prompt(
-            new SelectionPrompt<string>()
-                .Title("Select the deck you would like to study from:")
-                .PageSize(10)
-                .AddChoices(deckLookup.Keys)
-        );
+        var selectedDeck = DeckMenu.GetDeckSelection(decks);
+        int deckId = int.Parse(selectedDeck.Split(':')[0]);
+        var deck = decks.FirstOrDefault(d => d.Id == deckId);
+        var studySession = new StudySession { DeckStudied = deck };
 
-        var selectedDeck = deckLookup[selectedDeckKey];
-        var studySession = new StudySession { DeckStudied = selectedDeck };
-
-        var deckId = selectedDeck.Id;
+        // var deckId = selectedDeck.Id;
         int studySessionCount;
         
         do
@@ -209,6 +195,12 @@ public static class StudySessionMenu
         } while (studySessionCount <= 0);
         
         var flashCards = FlashCardMenu.GetFlashCards(deckId);
+        if (flashCards.Count == 0)
+        {
+            AnsiConsole.WriteLine("No FlashCards available for this deck. Press enter to continue.");
+            Console.ReadLine();
+            return;
+        }
         var randomizedFlashCards = flashCards.Values.OrderBy(f => random.Next()).ToList();
 
         var studyList = randomizedFlashCards.Take(studySessionCount).ToList();
@@ -238,7 +230,7 @@ public static class StudySessionMenu
         Console.ReadLine();
         
         studySession.DateStudied = DateTime.Now;
-        studySession.DeckStudied = selectedDeck;
+        studySession.DeckStudied = deck;
         context.StudySessions.Add(studySession);
         context.SaveChanges();
     }
