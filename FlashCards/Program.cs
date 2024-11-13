@@ -24,7 +24,7 @@ public static class Program
                     .PageSize(5)
                     .MoreChoicesText("[grey](Move up and down to reveal more options)[/]")
                     .AddChoices([
-                        "Manage Flash Cards", "Manage Decks", "Study Menu", "Exit Program"
+                        "Manage Flash Cards", "Manage Decks", "Study Menu", "Reports Menu", "Exit Program"
                     ]));
 
             switch (selection)
@@ -38,6 +38,9 @@ public static class Program
                 case "Study Menu":
                     StudySessionMenu.DisplayFlashCardMenu();
                     Console.ReadLine();
+                    break;
+                case "Reports Menu":
+                    ReportsMenu.DisplayFlashCardMenu();
                     break;
                 case "Exit Program":
                     continueProgram = false;
