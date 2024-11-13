@@ -9,6 +9,7 @@ This application allows users to create and study Stacks of Flashcards. Each sta
 - Flashcards are grouped under stacks, and each stack has a unique name.
 - Deleting a stack automatically deletes all its associated flashcards and study sessions.
 - Study Sessions are recorded when users study a stack, storing the date and score of each session.
+- Reports Study Session Scores and number of attempts.
 
 ## Requirements
 - Stacks must have unique names.
