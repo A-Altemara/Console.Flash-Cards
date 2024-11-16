@@ -1,6 +1,4 @@
 using FlashCards.Context;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using Spectre.Console;
 
 namespace FlashCards.Menus;

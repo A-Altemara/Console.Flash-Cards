@@ -5,7 +5,7 @@ using FlashCards.Models;
 
 namespace FlashCards.Demos;
 
-public class DemoStackBuilder
+public static class DemoStackBuilder
 {
     /// <summary>
     /// Imports the DemoCards.json file and adds the demo decks to the database. 
@@ -27,33 +27,29 @@ public class DemoStackBuilder
             return;
         }
 
-        await using (var context = new FlashCardsContext())
+        await using var context = new FlashCardsContext();
+        foreach (var deck in demoStack)
         {
-            foreach (var deck in demoStack)
+            if (context.Decks.Any(d => d.DeckName == deck.DeckName))
             {
-                if (context.Decks.Any(d => d.DeckName == deck.DeckName))
-                {
-                    AnsiConsole.Markup($"[yellow]Deck '{deck.DeckName}' already exists. Skipping...[/]\n");
-                    continue;
-                }
-
-                var addedDeck = await AddDeck(context, deck);
-                if (addedDeck is null)
-                {
-                    AnsiConsole.Markup("[red]Failed to add Deck.[/]\n");
-                    AnsiConsole.WriteLine("Press enter to continue.");
-                    Console.ReadLine();
-                    continue;
-                }
-                else
-                {
-                    AnsiConsole.Markup($"[green]Added {addedDeck.DeckName} and cards to the database![/]\n");
-                }
+                AnsiConsole.Markup($"[yellow]Deck '{deck.DeckName}' already exists. Skipping...[/]\n");
+                continue;
             }
 
-            AnsiConsole.WriteLine("\nDemo Decks added to the database. Press Enter to continue.");
-            Console.ReadLine();
+            var addedDeck = await AddDeck(context, deck);
+            if (addedDeck is null)
+            {
+                AnsiConsole.Markup("[red]Failed to add Deck.[/]\n");
+                AnsiConsole.WriteLine("Press enter to continue.");
+                Console.ReadLine();
+                continue;
+            }
+
+            AnsiConsole.Markup($"[green]Added {addedDeck.DeckName} and cards to the database![/]\n");
         }
+
+        AnsiConsole.WriteLine("\nDemo Decks added to the database. Press Enter to continue.");
+        Console.ReadLine();
     }
 
     /// <summary>
