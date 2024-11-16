@@ -4,7 +4,7 @@ using Spectre.Console;
 
 namespace FlashCards.Menus;
 
-public class FlashCardMenu()
+public static class FlashCardMenu
 {
     /// <summary>
     /// Displays the FlashCard menu and handles user selections for adding, deleting, editing, and viewing FlashCards.
@@ -81,7 +81,7 @@ public class FlashCardMenu()
     /// <summary>
     /// Menu for adding a new FlashCard to an existing deck or a new deck.
     /// </summary>
-    public static void AddFlashCardMenu()
+    private static void AddFlashCardMenu()
     {
         var continueProgram = true;
 
@@ -143,19 +143,23 @@ public class FlashCardMenu()
         var selectedDeck = DeckMenu.GetDeckSelection(decks);
         var question = AnsiConsole.Ask<string>("Enter the question for the new FlashCard: ");
         var answer = AnsiConsole.Ask<string>("Enter the answer for the new FlashCard: ");
+        
         var flashCard = new FlashCard
         {
             Question = question,
             Answer = answer,
             DeckId = selectedDeck.Id
         };
+        
         var flashCards = GetFlashCards(selectedDeck.Id);
+        
         if (flashCards.Values.Any(fc=>fc.Question == question))
         {
             AnsiConsole.WriteLine("FlashCard already exists in this deck. Press enter to continue.");
             Console.ReadLine();
             return;
         }
+        
         context.FlashCards.Add(flashCard);
         context.SaveChanges();
 
@@ -166,7 +170,7 @@ public class FlashCardMenu()
     /// <summary>
     /// Deletes a FlashCard from the database.
     /// </summary>
-    public static void DeleteFlashCard()
+    private static void DeleteFlashCard()
     {
         using var context = new FlashCardsContext();
         var decks = context.Decks.ToList();
@@ -210,7 +214,7 @@ public class FlashCardMenu()
     /// <summary>
     /// Edits a FlashCard in the database.
     /// </summary>
-    public static void EditFlashCard()
+    private static void EditFlashCard()
     {
         using var context = new FlashCardsContext();
         var decks = context.Decks.ToList();
@@ -222,6 +226,7 @@ public class FlashCardMenu()
         
         var selectedDeck = DeckMenu.GetDeckSelection(decks);
         var flashCards = GetFlashCards(selectedDeck.Id);
+        
         if (flashCards.Count == 0)
         {
             AnsiConsole.WriteLine("No FlashCards available for this deck. Press enter to continue.");
@@ -238,6 +243,7 @@ public class FlashCardMenu()
         );
         
         var flashCardId = int.Parse(selectedFlashCard.Split(':')[0]);
+        
         if (!flashCards.TryGetValue(flashCardId, out var flashCard))
         {
             AnsiConsole.WriteLine("FlashCard not found. Press enter to continue.");
@@ -247,6 +253,7 @@ public class FlashCardMenu()
 
         var newQuestion = AnsiConsole.Ask<string>("Enter the new question for the FlashCard: ");
         var newAnswer = AnsiConsole.Ask<string>("Enter the new answer for the FlashCard: ");
+        
         if (flashCards.Values.Any(fc=>fc.Question == newQuestion))
         {
             AnsiConsole.WriteLine("FlashCard already exists in this deck. Press enter to continue.");
@@ -287,13 +294,13 @@ public class FlashCardMenu()
     /// <returns>
     /// Dictionary of FlashCards
     /// </returns>
-    public static Dictionary<int, FlashCard> ViewFlashCards(Dictionary<int, FlashCard> flashCards)
+    private static void ViewFlashCards(Dictionary<int, FlashCard> flashCards)
     {
         var table = new Table();
 
         table.AddColumns(["Id", "Question", "Answer"]);
-        Dictionary<int, FlashCard> flashCardLookup = new();
         int displayId = 1;
+        
         foreach (var flashCard in flashCards.Values)
         {
             table.AddRow(
@@ -302,11 +309,9 @@ public class FlashCardMenu()
                 flashCard.Question,
                 flashCard.Answer
             ]);
-            flashCardLookup.Add(displayId, flashCard);
             displayId++;
         }
 
         AnsiConsole.Write(table);
-        return flashCardLookup;
     }
 }

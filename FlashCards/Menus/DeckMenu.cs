@@ -5,7 +5,7 @@ using Spectre.Console;
 
 namespace FlashCards.Menus;
 
-public class DeckMenu()
+public static class DeckMenu
 {
     /// <summary>
     /// Displays the Deck menu and handles user selections for adding, deleting, editing, and viewing decks.
@@ -62,31 +62,27 @@ public class DeckMenu()
     /// <returns>
     /// list of all decks in the database
     /// </returns>
-    public static List<Deck> ViewDecks()
+    public static void ViewDecks()
     {
-        using (var context = new FlashCardsContext())
+        using var context = new FlashCardsContext();
+        var decks = context.Decks.ToList();
+
+        if (decks.Count == 0)
         {
-            var decks = context.Decks.ToList();
+            AnsiConsole.WriteLine("No decks available.");
+        }
+        else
+        {
+            var table = new Table();
+            table.AddColumn("ID");
+            table.AddColumn("Deck Name");
 
-            if (decks.Count == 0)
+            foreach (var deck in decks)
             {
-                AnsiConsole.WriteLine("No decks available.");
-            }
-            else
-            {
-                var table = new Table();
-                table.AddColumn("ID");
-                table.AddColumn("Deck Name");
-
-                foreach (var deck in decks)
-                {
-                    table.AddRow(deck.Id.ToString(), deck.DeckName);
-                }
-
-                AnsiConsole.Write(table);
+                table.AddRow(deck.Id.ToString(), deck.DeckName);
             }
 
-            return decks;
+            AnsiConsole.Write(table);
         }
     }
 
@@ -104,11 +100,8 @@ public class DeckMenu()
         }
 
         var selectedDeck = GetDeckSelection(decks);
-
-        // int deckId = int.Parse(selectedDeck.Split(':')[0]);
-        // var selectedDeck = decks.FirstOrDefault(d => d.Id == deckId);
-
-        string newDeckName = AnsiConsole.Ask<string>("Enter the new name for the deck. Note Deck Names are Case Sensitive.");
+        string newDeckName =
+            AnsiConsole.Ask<string>("Enter the new name for the deck. Note Deck Names are Case Sensitive.");
 
         if (decks.Any(d => d.DeckName == newDeckName))
         {
@@ -134,7 +127,8 @@ public class DeckMenu()
                 .PageSize(10)
                 .AddChoices(deckNames)
         );
-        int deckId = int.Parse(selectedDeck.Split(':')[0]);
+
+        var deckId = int.Parse(selectedDeck.Split(':')[0]);
         var deck = decks.First(d => d.Id == deckId);
         return deck;
     }
@@ -144,40 +138,36 @@ public class DeckMenu()
     /// </summary>
     private static void DeleteDeck()
     {
-        using (var context = new FlashCardsContext())
+        using var context = new FlashCardsContext();
+        var decks = context.Decks.ToList();
+
+        if (decks.Count == 0)
         {
-            var decks = context.Decks.ToList();
+            return;
+        }
 
-            if (decks.Count == 0)
-            {
-                return;
-            }
+        var selectedDeck = GetDeckSelection(decks);
+        var confirmation = AnsiConsole.Prompt(new ConfirmationPrompt(
+            $"Are you sure you want to delete the deck '{selectedDeck.DeckName}'? " +
+            $"This will delete all associated flash cards and study sessions. (Y/N)"));
 
-            var selectedDeck = GetDeckSelection(decks);
-            // int deckId = int.Parse(selectedDeck.Split(':')[0]);
-            // var selectedDeck = decks.First(d => d.Id == deckId);
+        if (confirmation)
+        {
+            var flashCards = context.FlashCards.Where(fc => fc.DeckId == selectedDeck.Id).ToList();
+            var studySessions = context.StudySessions.Where(ss => ss.DeckStudiedId == selectedDeck.Id).ToList();
 
-            var confirmation = AnsiConsole.Prompt( new ConfirmationPrompt(
-                $"Are you sure you want to delete the deck '{selectedDeck.DeckName}'? " +
-                $"This will delete all associated flash cards and study sessions. (Y/N)"));
+            context.FlashCards.RemoveRange(flashCards);
+            context.StudySessions.RemoveRange(studySessions);
+            context.Decks.Remove(selectedDeck);
+            context.SaveChanges();
 
-            if (confirmation)
-            {
-                var flashCards = context.FlashCards.Where(fc => fc.DeckId == selectedDeck.Id).ToList();
-                var studySessions = context.StudySessions.Where(ss => ss.DeckStudiedId == selectedDeck.Id).ToList();
-
-                context.FlashCards.RemoveRange(flashCards);
-                context.StudySessions.RemoveRange(studySessions);
-                context.Decks.Remove(selectedDeck);
-                context.SaveChanges();
-
-                AnsiConsole.WriteLine($"Deck '{selectedDeck.DeckName}' deleted successfully. Press enter to continue.");
-                Console.ReadLine();
-            } else
-            {
-                AnsiConsole.WriteLine("Deck not deleted. Press enter to continue back to menu.");
-                Console.ReadLine();
-            }
+            AnsiConsole.WriteLine($"Deck '{selectedDeck.DeckName}' deleted successfully. Press enter to continue.");
+            Console.ReadLine();
+        }
+        else
+        {
+            AnsiConsole.WriteLine("Deck not deleted. Press enter to continue back to menu.");
+            Console.ReadLine();
         }
     }
 
@@ -187,7 +177,8 @@ public class DeckMenu()
     public static void AddDeck()
     {
         Console.Clear();
-        string deckName = AnsiConsole.Ask<string>("Enter the name of the new deck. Note Deck Names are Case Sensitive.");
+        string deckName =
+            AnsiConsole.Ask<string>("Enter the name of the new deck. Note Deck Names are Case Sensitive.");
         using (var context = new FlashCardsContext())
         {
             var decks = context.Decks.ToList();
