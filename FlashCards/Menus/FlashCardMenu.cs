@@ -16,8 +16,8 @@ public class FlashCardMenu()
         while (continueProgram)
         {
             Console.Clear();
-            AnsiConsole.Markup("[bold Purple]Welcome to Flash Cards![/]\n");
-            AnsiConsole.Markup("[Purple]Please select from the following options[/]\n");
+            AnsiConsole.MarkupLine("[bold Purple]Welcome to Flash Cards![/]");
+            AnsiConsole.MarkupLine("[Purple]Please select from the following options[/]");
             var selection = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                     .Title("What's your Selection?")
@@ -64,8 +64,7 @@ public class FlashCardMenu()
         }
         
         var selectedDeck = DeckMenu.GetDeckSelection(decks);
-        int deckId = int.Parse(selectedDeck.Split(':')[0]);
-        var flashCards = GetFlashCards(deckId);
+        var flashCards = GetFlashCards(selectedDeck.Id);
         
         if (flashCards.Count == 0)
         {
@@ -89,8 +88,8 @@ public class FlashCardMenu()
         while (continueProgram)
         {
             Console.Clear();
-            AnsiConsole.Markup("[bold Purple]Add a new flash card![/]\n");
-            AnsiConsole.Markup("[Purple]Please select from the following options[/]\n");
+            AnsiConsole.MarkupLine("[bold Purple]Add a new flash card![/]");
+            AnsiConsole.MarkupLine("[Purple]Please select from the following options[/]");
             var selection = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                     .Title("What's your Selection?")
@@ -142,16 +141,15 @@ public class FlashCardMenu()
         }
         
         var selectedDeck = DeckMenu.GetDeckSelection(decks);
-        int deckId = int.Parse(selectedDeck.Split(':')[0]);
         var question = AnsiConsole.Ask<string>("Enter the question for the new FlashCard: ");
         var answer = AnsiConsole.Ask<string>("Enter the answer for the new FlashCard: ");
         var flashCard = new FlashCard
         {
             Question = question,
             Answer = answer,
-            DeckId = deckId
+            DeckId = selectedDeck.Id
         };
-        var flashCards = GetFlashCards(deckId);
+        var flashCards = GetFlashCards(selectedDeck.Id);
         if (flashCards.Values.Any(fc=>fc.Question == question))
         {
             AnsiConsole.WriteLine("FlashCard already exists in this deck. Press enter to continue.");
@@ -179,8 +177,7 @@ public class FlashCardMenu()
         }
         
         var selectedDeck = DeckMenu.GetDeckSelection(decks);
-        int deckId = int.Parse(selectedDeck.Split(':')[0]);
-        var flashCards = GetFlashCards(deckId);
+        var flashCards = GetFlashCards(selectedDeck.Id);
         if (flashCards.Count == 0)
         {
             AnsiConsole.WriteLine("No FlashCards available for this deck. Press enter to continue.");
@@ -224,8 +221,7 @@ public class FlashCardMenu()
         }
         
         var selectedDeck = DeckMenu.GetDeckSelection(decks);
-        int deckId = int.Parse(selectedDeck.Split(':')[0]);
-        var flashCards = GetFlashCards(deckId);
+        var flashCards = GetFlashCards(selectedDeck.Id);
         if (flashCards.Count == 0)
         {
             AnsiConsole.WriteLine("No FlashCards available for this deck. Press enter to continue.");

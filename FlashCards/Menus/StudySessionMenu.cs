@@ -18,9 +18,9 @@ public static class StudySessionMenu
         while (continueProgram)
         {
             Console.Clear();
-            AnsiConsole.Markup("[bold blue]Welcome to Study Sessions![/]\n");
-            AnsiConsole.Markup("[blue]Study Sessions can not be edited or deleted.[/]\n");
-            AnsiConsole.Markup("[blue]Please select from the following options[/]\n");
+            AnsiConsole.MarkupLine("[bold blue]Welcome to Study Sessions![/]");
+            AnsiConsole.MarkupLine("[blue]Study Sessions can not be edited or deleted.[/]");
+            AnsiConsole.MarkupLine("[blue]Please select from the following options[/]");
             var selection = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                     .Title("What's your Selection?")
@@ -81,7 +81,7 @@ public static class StudySessionMenu
                 var selectedDeck = decks.FirstOrDefault(d => d.Id == deckid);
                 if (studySessions.Count == 0)
                 {
-                    AnsiConsole.Markup($"[Red]No Study Sessions available for {selectedDeck.DeckName}.[/]\n");
+                    AnsiConsole.MarkupLine($"[Red]No Study Sessions available for {selectedDeck.DeckName}.[/]");
                     continue;
                 }
 
@@ -116,12 +116,10 @@ public static class StudySessionMenu
         }
 
         var selectedDeck = DeckMenu.GetDeckSelection(decks);
-        int deckId = int.Parse(selectedDeck.Split(':')[0]);
-        var deck = decks.FirstOrDefault(d => d.Id == deckId);
-        var studySessions = GetStudySessions(deckId);
+        var studySessions = GetStudySessions(selectedDeck.Id);
         if (studySessions.Count == 0)
         {
-            AnsiConsole.WriteLine($"No Study Sessions available for {deck.DeckName}.");
+            AnsiConsole.WriteLine($"No Study Sessions available for {selectedDeck.DeckName}.");
             return;
         }
 
@@ -134,7 +132,7 @@ public static class StudySessionMenu
         {
             var studySessionDate = studySession.DateStudied.Day + "/" + studySession.DateStudied.Month + "/" + studySession.DateStudied.Year;
             percentCorrect = (decimal)studySession.NumberCorrect / studySession.NumberAsked * 100;
-            table.AddRow(studySession.Id.ToString(), deck.DeckName,studySessionDate,
+            table.AddRow(studySession.Id.ToString(), selectedDeck.DeckName,studySessionDate,
                 studySession.NumberAsked.ToString(),
                 studySession.NumberCorrect.ToString(), percentCorrect.ToString("0.00") + "%");
         }
@@ -178,9 +176,7 @@ public static class StudySessionMenu
         }
 
         var selectedDeck = DeckMenu.GetDeckSelection(decks);
-        int deckId = int.Parse(selectedDeck.Split(':')[0]);
-        var deck = decks.FirstOrDefault(d => d.Id == deckId);
-        var studySession = new StudySession { DeckStudied = deck };
+        var studySession = new StudySession { DeckStudied = selectedDeck };
 
         // var deckId = selectedDeck.Id;
         int studySessionCount;
@@ -190,11 +186,11 @@ public static class StudySessionMenu
             studySessionCount = AnsiConsole.Ask<int >("How many FlashCards would you like to study?");
             if (studySessionCount < 0)
             {
-                AnsiConsole.Markup("[red]Invalid Entry. Please enter a number greater than 0.[/]\n");
+                AnsiConsole.MarkupLine("[red]Invalid Entry. Please enter a number greater than 0.[/]");
             }
         } while (studySessionCount <= 0);
         
-        var flashCards = FlashCardMenu.GetFlashCards(deckId);
+        var flashCards = FlashCardMenu.GetFlashCards(selectedDeck.Id);
         if (flashCards.Count == 0)
         {
             AnsiConsole.WriteLine("No FlashCards available for this deck. Press enter to continue.");
@@ -218,7 +214,7 @@ public static class StudySessionMenu
             }
             else
             {
-                AnsiConsole.Markup("[red]Incorrect![/]\n");
+                AnsiConsole.MarkupLine("[red]Incorrect![/]");
                 AnsiConsole.WriteLine($"The correct answer is: {flashCard.Answer}");
             }
 
@@ -230,7 +226,7 @@ public static class StudySessionMenu
         Console.ReadLine();
         
         studySession.DateStudied = DateTime.Now;
-        studySession.DeckStudied = deck;
+        studySession.DeckStudied = selectedDeck;
         context.StudySessions.Add(studySession);
         context.SaveChanges();
     }

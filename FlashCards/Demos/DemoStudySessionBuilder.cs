@@ -27,7 +27,7 @@ public class DemoStudySessionBuilder
             return;
         }
 
-        AnsiConsole.Markup("\n[green]Decks found in the database. Generating random study sessions...[/]\n");
+        AnsiConsole.MarkupLine("\n[green]Decks found in the database. Generating random study sessions...[/]");
         foreach (var deckId in deckIds)
         {
             using var context = new FlashCardsContext();
@@ -35,13 +35,13 @@ public class DemoStudySessionBuilder
 
             if (deck is null)
             {
-                AnsiConsole.Markup($"[red]Deck with ID {deckId} not found in the database. Skipping...[/]\n");
+                AnsiConsole.MarkupLine($"[red]Deck with ID {deckId} not found in the database. Skipping...[/]");
                 continue;
             }
 
             if (deck.FlashCards.Count == 0)
             {
-                AnsiConsole.Markup($"[red]Deck '{deck.DeckName}' has no cards. Skipping...[/]\n");
+                AnsiConsole.MarkupLine($"[red]Deck '{deck.DeckName}' has no cards. Skipping...[/]");
                 continue;
             }
 
@@ -68,7 +68,7 @@ public class DemoStudySessionBuilder
             context.StudySessions.AddRange(studySessions);
             context.SaveChanges();
 
-            AnsiConsole.Markup($"[green]Study Sessions for Deck '{deck.DeckName}' created with 10 cards.[/]\n");
+            AnsiConsole.MarkupLine($"[green]Study Sessions for Deck '{deck.DeckName}' created with 10 cards.[/]");
         }
 
         AnsiConsole.WriteLine("Press enter to continue.");

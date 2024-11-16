@@ -16,8 +16,8 @@ public static class Program
         {
             Console.Clear();
 
-            AnsiConsole.Markup("[bold Blue]Welcome to Flash Cards![/]\n");
-            AnsiConsole.Markup("[blue]Please select from the following options[/]\n");
+            AnsiConsole.MarkupLine("[bold Blue]Welcome to Flash Cards![/]");
+            AnsiConsole.MarkupLine("[blue]Please select from the following options[/]");
             var selection = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                     .Title("What's your Selection?")

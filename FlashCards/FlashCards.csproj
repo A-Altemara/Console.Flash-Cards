@@ -27,6 +27,13 @@
       <None Update="Demos\DemoCards.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="bin\debug\net8.0\" />
     </ItemGroup>
 
 </Project>

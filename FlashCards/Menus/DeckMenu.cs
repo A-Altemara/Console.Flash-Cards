@@ -17,8 +17,8 @@ public class DeckMenu()
         while (continueProgram)
         {
             Console.Clear();
-            AnsiConsole.Markup("[bold Purple]Welcome to Decks![/]\n");
-            AnsiConsole.Markup("[Purple]Please select from the following options[/]\n");
+            AnsiConsole.MarkupLine("[bold Purple]Welcome to Decks![/]");
+            AnsiConsole.MarkupLine("[Purple]Please select from the following options[/]");
             var selection = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                     .Title("What's your Selection?")
@@ -105,8 +105,8 @@ public class DeckMenu()
 
         var selectedDeck = GetDeckSelection(decks);
 
-        int deckId = int.Parse(selectedDeck.Split(':')[0]);
-        var deck = decks.FirstOrDefault(d => d.Id == deckId);
+        // int deckId = int.Parse(selectedDeck.Split(':')[0]);
+        // var selectedDeck = decks.FirstOrDefault(d => d.Id == deckId);
 
         string newDeckName = AnsiConsole.Ask<string>("Enter the new name for the deck. Note Deck Names are Case Sensitive.");
 
@@ -117,15 +117,15 @@ public class DeckMenu()
             return;
         }
 
-        deck.DeckName = newDeckName;
-        context.Decks.Update(deck);
+        selectedDeck.DeckName = newDeckName;
+        context.Decks.Update(selectedDeck);
         context.SaveChanges();
 
-        AnsiConsole.WriteLine($"Deck '{deck.DeckName}' updated successfully. Press enter to continue.");
+        AnsiConsole.WriteLine($"Deck '{selectedDeck.DeckName}' updated successfully. Press enter to continue.");
         Console.ReadLine();
     }
 
-    public static string GetDeckSelection(List<Deck> decks)
+    public static Deck GetDeckSelection(List<Deck> decks)
     {
         var deckNames = decks.Select(d => $"{d.Id}: {d.DeckName}").ToList();
         var selectedDeck = AnsiConsole.Prompt(
@@ -134,7 +134,9 @@ public class DeckMenu()
                 .PageSize(10)
                 .AddChoices(deckNames)
         );
-        return selectedDeck;
+        int deckId = int.Parse(selectedDeck.Split(':')[0]);
+        var deck = decks.First(d => d.Id == deckId);
+        return deck;
     }
 
     /// <summary>
@@ -152,28 +154,26 @@ public class DeckMenu()
             }
 
             var selectedDeck = GetDeckSelection(decks);
-            int deckId = int.Parse(selectedDeck.Split(':')[0]);
-            var deck = decks.FirstOrDefault(d => d.Id == deckId);
+            // int deckId = int.Parse(selectedDeck.Split(':')[0]);
+            // var selectedDeck = decks.First(d => d.Id == deckId);
 
-            string confirmation = AnsiConsole.Ask<string>(
-                $"Are you sure you want to delete the deck '{deck.DeckName}'? " +
-                $"This will delete all associated flash cards and study sessions. (Y/N)");
+            var confirmation = AnsiConsole.Prompt( new ConfirmationPrompt(
+                $"Are you sure you want to delete the deck '{selectedDeck.DeckName}'? " +
+                $"This will delete all associated flash cards and study sessions. (Y/N)"));
 
-            if (confirmation.ToLower() == "y")
+            if (confirmation)
             {
-                var flashCards = context.FlashCards.Where(fc => fc.DeckId == deckId).ToList();
-                var studySessions = context.StudySessions.Where(ss => ss.DeckStudiedId == deckId).ToList();
+                var flashCards = context.FlashCards.Where(fc => fc.DeckId == selectedDeck.Id).ToList();
+                var studySessions = context.StudySessions.Where(ss => ss.DeckStudiedId == selectedDeck.Id).ToList();
 
                 context.FlashCards.RemoveRange(flashCards);
                 context.StudySessions.RemoveRange(studySessions);
-                context.Decks.Remove(deck);
+                context.Decks.Remove(selectedDeck);
                 context.SaveChanges();
 
-                AnsiConsole.WriteLine($"Deck '{deck.DeckName}' deleted successfully. Press enter to continue.");
+                AnsiConsole.WriteLine($"Deck '{selectedDeck.DeckName}' deleted successfully. Press enter to continue.");
                 Console.ReadLine();
-            }
-
-            if (confirmation.ToLower() == "n")
+            } else
             {
                 AnsiConsole.WriteLine("Deck not deleted. Press enter to continue back to menu.");
                 Console.ReadLine();

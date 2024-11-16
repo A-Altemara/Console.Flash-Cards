@@ -14,9 +14,9 @@ public class ReportsMenu
         while (continueProgram)
         {
             Console.Clear();
-            AnsiConsole.Markup("[bold blue]Welcome to Study Sessions![/]\n");
-            AnsiConsole.Markup("[blue]Study Sessions can not be edited or deleted.[/]\n");
-            AnsiConsole.Markup("[blue]Please select from the following options[/]\n");
+            AnsiConsole.MarkupLine("[bold blue]Welcome to Study Sessions![/]");
+            AnsiConsole.MarkupLine("[blue]Study Sessions can not be edited or deleted.[/]");
+            AnsiConsole.MarkupLine("[blue]Please select from the following options[/]");
             var selection = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                     .Title("What's your Selection?")
@@ -54,11 +54,10 @@ private static void AverageStudySessionScoreOverYear()
     }
 
     var selectedDeck = DeckMenu.GetDeckSelection(decks);
-    int deckId = int.Parse(selectedDeck.Split(':')[0]);
     var year = AnsiConsole.Ask<int>("Enter the year for which you want to view the average study session scores:");
 
     var studySessions = context.StudySessions
-        .Where(ss => ss.DeckStudiedId == deckId && ss.DateStudied.Year == year)
+        .Where(ss => ss.DeckStudiedId == selectedDeck.Id && ss.DateStudied.Year == year)
         .Select(ss => new
         {
             Month = ss.DateStudied.Month,
@@ -104,11 +103,10 @@ private static void AverageStudySessionScoreOverYear()
         }
 
         var selectedDeck = DeckMenu.GetDeckSelection(decks);
-        int deckId = int.Parse(selectedDeck.Split(':')[0]);
         var year = AnsiConsole.Ask<int>("Enter the year for which you want to view the total number of study session:");
         
         var studySessions = context.StudySessions
-            .Where(ss => ss.DeckStudiedId == deckId && ss.DateStudied.Year == year)
+            .Where(ss => ss.DeckStudiedId == selectedDeck.Id && ss.DateStudied.Year == year)
             .Select(ss => new
             {
                 Month = ss.DateStudied.Month,
